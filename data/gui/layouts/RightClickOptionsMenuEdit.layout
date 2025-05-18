@@ -1,0 +1,63 @@
+FrameWidgetClass RootFrame {
+ clipchildren 0
+ position 0 0
+ size 0 0
+ hexactpos 1
+ vexactpos 1
+ hexactsize 1
+ vexactsize 1
+ {
+  GridSpacerWidgetClass GridSpacer {
+   ignorepointer 1
+   color 0.2275 0.2275 0.2275 1
+   position 10 10
+   size 150 75
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style Colorable
+   Padding 5
+   Margin 5
+   Columns 1
+   {
+    ButtonWidgetClass DeleteButton {
+     color 0.502 0 0 1
+     position 10 10
+     size 48 48
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     style Colorable
+     text "#STR_ZenMap_DeleteMarker"
+     font "gui/fonts/metron"
+    }
+    ButtonWidgetClass EditButton {
+     color 0 0.502 0.1255 1
+     position 10 10
+     size 48 48
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     style Colorable
+     text "#STR_ZenMap_EditMarker"
+     font "gui/fonts/metron"
+    }
+    ButtonWidgetClass CancelButton {
+     color 0.4627 0.4627 0.4627 1
+     position 10 10
+     size 48 48
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     style Colorable
+     text "#menu_cancel"
+     font "gui/fonts/metron"
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,69 @@
+FrameWidgetClass RootFrame {
+ clipchildren 0
+ position 0 0
+ size 1 1
+ hexactpos 0
+ vexactpos 0
+ hexactsize 0
+ vexactsize 0
+ {
+  PanelWidgetClass ConfirmPanel {
+   ignorepointer 1
+   color 0 0 0 0.9412
+   size 0.2 0.1
+   halign center_ref
+   valign center_ref
+   hexactpos 0
+   vexactpos 0
+   hexactsize 0
+   vexactsize 0
+   style DayZDefaultPanel
+   {
+    MultilineTextWidgetClass ConfirmTitle {
+     ignorepointer 1
+     position 0 0.05
+     size 0.9 0.5
+     halign center_ref
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     text "#STR_ZenMap_Confirm"
+     font "gui/fonts/metron"
+     "exact text" 0
+     "text halign" center
+     "text valign" center
+     wrap 1
+    }
+    ButtonWidgetClass ConfirmCancelButton {
+     color 0.502 0.502 0.502 1
+     position 0.25 0.05
+     size 0.4 0.4
+     halign center_ref
+     valign bottom_ref
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     style DayZDefaultButton
+     text "#menu_cancel"
+     font "gui/fonts/metron"
+    }
+    ButtonWidgetClass ConfirmYesButton {
+     color 0.502 0 0 1
+     position -0.25 0.05
+     size 0.4 0.4
+     halign center_ref
+     valign bottom_ref
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     style DayZDefaultButton
+     text "#main_menu_continue"
+     font "gui/fonts/metron"
+    }
+   }
+  }
+ }
+}
