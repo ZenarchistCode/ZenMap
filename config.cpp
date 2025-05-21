@@ -111,7 +111,6 @@ class CfgSoundShaders
 			{ "ZenMap\data\sounds\zen_mapmarker4", 1 },
 			{ "ZenMap\data\sounds\zen_mapmarker5", 1 },
 			{ "ZenMap\data\sounds\zen_mapmarker6", 1 }
-		}; 
-		}; 
+		};
 	};
 };

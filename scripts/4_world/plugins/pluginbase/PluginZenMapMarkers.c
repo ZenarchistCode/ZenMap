@@ -2,6 +2,9 @@ class PluginZenMapMarkers extends PluginBase
 {
     protected ref array<ref MapMarker> m_MapMarkers;
 
+    //                uid,    marker array
+    protected ref map<string, ref array<ref MapMarker>> m_PlayerSpecificMapMarkers;
+
 	override void OnInit()
     {
         #ifdef ZENMODPACK
@@ -11,6 +14,7 @@ class PluginZenMapMarkers extends PluginBase
         #endif
         
         m_MapMarkers = new array<ref MapMarker>;
+        m_PlayerSpecificMapMarkers = new map<string, ref array<ref MapMarker>>;
 
         AddStaticServerMarks();
     }
@@ -63,11 +67,13 @@ class PluginZenMapMarkers extends PluginBase
 
     MapMarker AddMarker(MapMarker marker)
     {
-        Print("[ZenMapPlugin] Adding server-side marker " + marker.GetMarkerText() + " @ " + marker.GetMarkerPos());
         m_MapMarkers.Insert(marker);
         ResyncMarkers();
+        Print("[ZenMapPlugin] Added server-side marker " + marker.GetMarkerText() + " @ " + marker.GetMarkerPos());
         return marker;
     }
+
+    //! SERVER STATIC MARKERS
 
     bool RemoveMarkerByIndex(int index)
     {
@@ -161,6 +167,168 @@ class PluginZenMapMarkers extends PluginBase
         ResyncMarkers();
     }
 
+    //! PLAYER SPECIFIC MARKERS
+
+    bool AddMarker(PlayerBase player, MapMarker marker)
+    {
+        if (!player || !player.GetIdentity() || !marker)
+            return false;
+
+        array<ref MapMarker> tempArray = new array<ref MapMarker>;
+        string uid = player.GetIdentity().GetId();
+
+        if (!m_PlayerSpecificMapMarkers.Find(uid, tempArray))
+        {
+            m_PlayerSpecificMapMarkers.Insert(uid, tempArray);
+        }
+
+        // Array was not found in player marker map<>, which means tempArray is now nullified and requires reset
+        if (!tempArray)
+        {
+            tempArray = new array<ref MapMarker>;
+        }
+
+        tempArray.Insert(marker);
+        m_PlayerSpecificMapMarkers.Set(uid, tempArray);
+
+        SyncMarkers(player);
+        Print("[ZenMapPlugin] Added player marker " + marker.GetMarkerText() + " @ " + marker.GetMarkerPos() + " for " + uid);
+        
+        return true;
+    }
+
+    bool RemoveMarkerByIndex(PlayerBase player, int index)
+    {
+        if (!player || !player.GetIdentity() || index < 0 || index >= m_MapMarkers.Count())
+            return false;
+
+        string uid = player.GetIdentity().GetId();
+        array<ref MapMarker> tempArray = new array<ref MapMarker>;
+
+        if (!m_PlayerSpecificMapMarkers.Find(uid, tempArray))
+        {
+            // Player has no map markers. Return true or false here? What a philosophical conundrum..
+            return true;
+        }
+
+        tempArray.Remove(index);
+        m_PlayerSpecificMapMarkers.Set(uid, tempArray);
+
+        SyncMarkers(player);
+        return true;
+    }
+
+    bool RemoveMarkerByName(PlayerBase player, string name)
+    {
+        if (!player || !player.GetIdentity())
+            return false;
+
+        string uid = player.GetIdentity().GetId();
+        array<ref MapMarker> tempArray = new array<ref MapMarker>;
+        
+        if (!m_PlayerSpecificMapMarkers.Find(uid, tempArray))
+        {
+            return true;
+        }
+
+        name.ToLower();
+        string markerText;
+
+        for (int i = 0; i < tempArray.Count(); i++)
+        {
+            markerText = tempArray.Get(i).GetMarkerText();
+            markerText.ToLower();
+
+            if (markerText == name)
+            {
+                tempArray.Remove(i);
+
+                m_PlayerSpecificMapMarkers.Set(uid, tempArray);
+                SyncMarkers(player);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool RemoveMarkerByPosition(PlayerBase player, vector pos)
+    {
+        if (!player || !player.GetIdentity())
+            return false;
+
+        string uid = player.GetIdentity().GetId();
+        array<ref MapMarker> tempArray = new array<ref MapMarker>;
+
+        if (!m_PlayerSpecificMapMarkers.Find(uid, tempArray))
+        {
+            return true;
+        }
+
+        for (int i = 0; i < tempArray.Count(); i++)
+        {
+            if (tempArray.Get(i).GetMarkerPos() == pos)
+            {
+                tempArray.Remove(i);
+
+                m_PlayerSpecificMapMarkers.Set(uid, tempArray);
+                SyncMarkers(player);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool RemoveMarker(PlayerBase player, MapMarker marker)
+    {
+        if (!player || !player.GetIdentity())
+            return false;
+
+        string uid = player.GetIdentity().GetId();
+        array<ref MapMarker> tempArray = new array<ref MapMarker>;
+        
+        if (!m_PlayerSpecificMapMarkers.Find(uid, tempArray))
+        {
+            return true;
+        }
+
+        MapMarker checkMarker;
+        string checkMarkerText;
+        string markerText = marker.GetMarkerText();
+        markerText.ToLower();
+
+        for (int i = 0; i < tempArray.Count(); i++)
+        {
+            checkMarker = tempArray.Get(i);
+
+            checkMarkerText = checkMarker.GetMarkerText();
+            checkMarkerText.ToLower();
+
+            if (checkMarkerText != markerText)
+                continue;
+
+            if (checkMarker.GetMarkerPos() != marker.GetMarkerPos())
+                continue;
+
+            if (checkMarker.GetMarkerColor() != marker.GetMarkerColor())
+                continue;
+
+            if (checkMarker.GetMarkerIcon() != marker.GetMarkerIcon())
+                continue;
+
+            tempArray.Remove(i);
+
+            m_PlayerSpecificMapMarkers.Set(uid, tempArray);
+            SyncMarkers(player);
+            return true;
+        }
+
+        return false;
+    }
+
+    //! SYNC
+
     void ResyncMarkers()
     {
         if (!GetGame().IsDedicatedServer())
@@ -191,6 +359,18 @@ class PluginZenMapMarkers extends PluginBase
         if (!player.GetIdentity())
             return;
 
-        GetRPCManager().SendRPC("ZenMod_RPC", "RPC_ReceiveZenMapMarkers", new Param1<ref array<ref MapMarker>>(m_MapMarkers), true, player.GetIdentity());
+        array<ref MapMarker> tempServerArray = new array<ref MapMarker>;
+        array<ref MapMarker> tempPlayerArray = new array<ref MapMarker>;
+
+        if (m_PlayerSpecificMapMarkers.Find(player.GetIdentity().GetId(), tempPlayerArray))
+        {
+            for (int i = 0; i < tempPlayerArray.Count(); i++)
+            {
+                tempServerArray.Insert(tempPlayerArray.Get(i));
+            }
+        }
+
+        Print("[ZenMap] Syncing " + tempServerArray.Count() + " server-side array markers for player " + player.GetIdentity().GetId());
+        GetRPCManager().SendRPC("ZenMod_RPC", "RPC_ReceiveZenMapMarkers", new Param1<ref array<ref MapMarker>>(tempServerArray), true, player.GetIdentity());
     }
 }
