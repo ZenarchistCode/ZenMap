@@ -359,12 +359,18 @@ class PluginZenMapMarkers extends PluginBase
         if (!player.GetIdentity())
             return;
 
+        int i;
         array<ref MapMarker> tempServerArray = new array<ref MapMarker>;
         array<ref MapMarker> tempPlayerArray = new array<ref MapMarker>;
 
+        for (i = 0; i < GetMapMarkers().Count(); i++)
+        {
+            tempServerArray.Insert(GetMapMarkers().Get(i));
+        }
+
         if (m_PlayerSpecificMapMarkers.Find(player.GetIdentity().GetId(), tempPlayerArray))
         {
-            for (int i = 0; i < tempPlayerArray.Count(); i++)
+            for (i = 0; i < tempPlayerArray.Count(); i++)
             {
                 tempServerArray.Insert(tempPlayerArray.Get(i));
             }
