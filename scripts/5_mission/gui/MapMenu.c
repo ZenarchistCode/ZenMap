@@ -4,9 +4,33 @@ modded class MapMenu
 	protected ref ZenMapMarkerListView m_ZenViewMarkersList;
 	protected ref ZenMapErrorDialog m_ZenErrorDialog;
 
+	override void OnShow()
+	{
+		super.OnShow();
+
+		if (ZenMapStaticObjectsConfig.OPENED_MAP_BY_ZENSTATICMAP)
+		{
+			PlayerBase pb = PlayerBase.Cast(GetGame().GetPlayer());
+			if (!pb)
+				return;
+
+			LoadMapMarkers();
+			m_MapWidgetInstance.SetMapPos(pb.GetPosition());
+			m_MapWidgetInstance.SetScale(0.2); // 0.85
+			AddZenMapWidgetMarker(pb.GetPosition(), "", ARGB(255, 255, 0, 0), "DZ/gear/navigation/data/map_border_cross_ca.paa");
+		}
+	}
+
 	override void CloseMapMenu()
 	{
 		super.CloseMapMenu();
+
+		if (ZenMapStaticObjectsConfig.OPENED_MAP_BY_ZENSTATICMAP)
+		{
+			ZenMapStaticObjectsConfig.OPENED_MAP_BY_ZENSTATICMAP = false;
+			GetGame().GetMission().RemoveActiveInputExcludes({"map"});
+			GetGame().GetMission().RemoveActiveInputRestriction(EInputRestrictors.MAP);
+		}
 
 		#ifdef ZENMODPACK 
 		if (!ZenModEnabled("ZenMap"))

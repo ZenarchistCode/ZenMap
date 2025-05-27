@@ -13,6 +13,11 @@ modded class MissionGameplay
 		}
 		#endif
 
+		if (!GetZenMapConfig().ClientConfig)
+		{
+			return;
+		}
+
 		if (!GetZenMapConfig().ClientConfig.TakeMapToHandsOnHotkey)
 		{
 			return;
@@ -70,11 +75,7 @@ modded class MissionGameplay
 		{
 			super.HandleMapToggleByKeyboardShortcut(player);
 
-			//! TODO: Check we need this?
-			//if (GetZenMapConfig().ClientConfig.SaveMarkersOntoMap_Item)
-			//{
-				ZenMap_HandleMapToggleByKeyboardShortcut(player);
-			//}
+			ZenMap_HandleMapToggleByKeyboardShortcut(player);
 
 			MapMenu mapMenu = MapMenu.Cast(GetGame().GetUIManager().FindMenu(MENU_MAP));
 			if (mapMenu)

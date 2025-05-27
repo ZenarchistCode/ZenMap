@@ -77,7 +77,7 @@ class ZenMapRightClickMenu extends ScriptedWidgetEventHandler
 		m_IconList = TextListboxWidget.Cast(m_RightClickRoot_GUI.FindAnyWidget("IconList"));
 		m_SaveToMapCB = CheckBoxWidget.Cast(m_RightClickRoot_GUI.FindAnyWidget("SaveToMapCB"));
 
-		if (GetZenMapConfig().ClientConfig.SaveMarkersOntoMapItem && GetZenMapConfig().ClientConfig.AllowPlayerToDecide)
+		if (GetZenMapConfig().ClientConfig.SaveMarkersOntoMapItem && GetZenMapConfig().ClientConfig.AllowPlayerToDecide && m_MapMenu.GetZenMapItem())
 		{
 			m_SaveToMapCB.SetChecked(GetZenMapClientMarkersLocalConfig().SaveToMap);
 		}

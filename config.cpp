@@ -84,6 +84,21 @@ class CfgVehicles
 		repairableWithKits[] = { 5 };
 		repairCosts[] = { 10 };
 	};
+
+	// Static map object (invisible object proxy)
+	class HouseNoDestruct;
+	class Zen_StaticMap: HouseNoDestruct
+	{
+		scope=1;
+		physLayer="item_small";
+		model="ZenMap\data\models\zen_staticmap.p3d";
+	};
+	class Zen_StaticMap_Debug: Zen_StaticMap
+	{
+		scope=1;
+		physLayer="item_small";
+		model="ZenMap\data\models\zen_staticmap_debug.p3d";
+	};
 };
 
 class CfgSoundSets

@@ -327,6 +327,50 @@ class PluginZenMapMarkers extends PluginBase
         return false;
     }
 
+    MapMarker GetMarker(PlayerBase player, MapMarker marker)
+    {
+        if (!player || !player.GetIdentity())
+            return NULL;
+
+        string uid = player.GetIdentity().GetId();
+
+        MapMarker checkMarker;
+        string checkMarkerText;
+        string markerText = marker.GetMarkerText();
+        markerText.ToLower();
+
+        array<ref MapMarker> tempArray = new array<ref MapMarker>;
+        
+        if (!m_PlayerSpecificMapMarkers.Find(uid, tempArray))
+        {
+            return NULL;
+        }
+
+        for (int i = 0; i < tempArray.Count(); i++)
+        {
+            checkMarker = tempArray.Get(i);
+
+            checkMarkerText = checkMarker.GetMarkerText();
+            checkMarkerText.ToLower();
+
+            if (checkMarkerText != markerText)
+                continue;
+
+            if (checkMarker.GetMarkerPos() != marker.GetMarkerPos())
+                continue;
+
+            if (checkMarker.GetMarkerColor() != marker.GetMarkerColor())
+                continue;
+
+            if (checkMarker.GetMarkerIcon() != marker.GetMarkerIcon())
+                continue;
+
+            return tempArray.Get(i);
+        }
+
+        return NULL;
+    }
+
     //! SYNC
 
     void ResyncMarkers()
