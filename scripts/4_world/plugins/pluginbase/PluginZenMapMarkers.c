@@ -65,6 +65,11 @@ class PluginZenMapMarkers extends PluginBase
         return m_MapMarkers;
     }
 
+    map<string, ref array<ref MapMarker>> GetPlayerMapMarkers()
+    {
+        return m_PlayerSpecificMapMarkers;
+    }
+
     MapMarker AddMarker(MapMarker marker)
     {
         m_MapMarkers.Insert(marker);
@@ -174,8 +179,16 @@ class PluginZenMapMarkers extends PluginBase
         if (!player || !player.GetIdentity() || !marker)
             return false;
 
+        return AddMarker(player.GetIdentity(), marker);
+    }
+
+    bool AddMarker(PlayerIdentity identity, MapMarker marker)
+    {
+        if (!identity || !marker)
+            return false;
+
         array<ref MapMarker> tempArray = new array<ref MapMarker>;
-        string uid = player.GetIdentity().GetId();
+        string uid = identity.GetId();
 
         if (!m_PlayerSpecificMapMarkers.Find(uid, tempArray))
         {
@@ -188,10 +201,15 @@ class PluginZenMapMarkers extends PluginBase
             tempArray = new array<ref MapMarker>;
         }
 
+        if (GetMarker(identity, marker) != NULL)
+        {
+            return false; // already exists
+        }
+
         tempArray.Insert(marker);
         m_PlayerSpecificMapMarkers.Set(uid, tempArray);
 
-        SyncMarkers(player);
+        SyncMarkers(identity);
         Print("[ZenMapPlugin] Added player marker " + marker.GetMarkerText() + " @ " + marker.GetMarkerPos() + " for " + uid);
         
         return true;
@@ -332,7 +350,15 @@ class PluginZenMapMarkers extends PluginBase
         if (!player || !player.GetIdentity())
             return NULL;
 
-        string uid = player.GetIdentity().GetId();
+        return GetMarker(player.GetIdentity(), marker);
+    }
+
+    MapMarker GetMarker(PlayerIdentity identity, MapMarker marker)
+    {
+        if (!identity)
+            return NULL;
+
+        string uid = identity.GetId();
 
         MapMarker checkMarker;
         string checkMarkerText;
@@ -371,6 +397,23 @@ class PluginZenMapMarkers extends PluginBase
         return NULL;
     }
 
+    void ClearPlayerMarkers(PlayerBase player)
+    {
+        if (!player || !player.GetIdentity())
+            return;
+
+        ClearPlayerMarkers(player.GetIdentity());
+    }
+
+    void ClearPlayerMarkers(notnull PlayerIdentity identity)
+    {
+        if (GetPlayerMapMarkers().Contains(identity.GetId()))
+		{
+            Print("[ZenMapPlugin] Clearing all markers for player " + identity.GetId());
+			GetPlayerMapMarkers().Get(identity.GetId()).Clear();
+		}
+    }
+
     //! SYNC
 
     void ResyncMarkers()
@@ -392,15 +435,20 @@ class PluginZenMapMarkers extends PluginBase
         }
     }
 
-    void SyncMarkers(notnull PlayerBase player)
+    void SyncMarkers(PlayerBase player)
+    {
+        if (!player || !player.GetIdentity())
+            return;
+
+        SyncMarkers(player.GetIdentity());
+    }
+
+    void SyncMarkers(notnull PlayerIdentity identity)
     {
         if (!GetGame().IsDedicatedServer())
             return;
 
         if (CfgGameplayHandler.GetUse3DMap())
-            return;
-
-        if (!player.GetIdentity())
             return;
 
         int i;
@@ -412,7 +460,7 @@ class PluginZenMapMarkers extends PluginBase
             tempServerArray.Insert(GetMapMarkers().Get(i));
         }
 
-        if (m_PlayerSpecificMapMarkers.Find(player.GetIdentity().GetId(), tempPlayerArray))
+        if (m_PlayerSpecificMapMarkers.Find(identity.GetId(), tempPlayerArray))
         {
             for (i = 0; i < tempPlayerArray.Count(); i++)
             {
@@ -420,7 +468,7 @@ class PluginZenMapMarkers extends PluginBase
             }
         }
 
-        Print("[ZenMap] Syncing " + tempServerArray.Count() + " server-side array markers for player " + player.GetIdentity().GetId());
-        GetRPCManager().SendRPC("ZenMod_RPC", "RPC_ReceiveZenMapMarkers", new Param1<ref array<ref MapMarker>>(tempServerArray), true, player.GetIdentity());
+        Print("[ZenMap] Syncing " + tempServerArray.Count() + " server-side array markers for player " + identity.GetId());
+        GetRPCManager().SendRPC("ZenMod_RPC", "RPC_ReceiveZenMapMarkers", new Param1<ref array<ref MapMarker>>(tempServerArray), true, identity);
     }
 }

@@ -35,7 +35,19 @@ modded class MissionServer
 		PluginZenMapMarkers mapPlugin = PluginZenMapMarkers.Cast(GetPlugin(PluginZenMapMarkers));
 		if (mapPlugin)
 		{
+			mapPlugin.ClearPlayerMarkers(player);
 			mapPlugin.SyncMarkers(player);
+		}
+	}
+
+	override void InvokeOnDisconnect(PlayerBase player)
+	{
+		super.InvokeOnDisconnect(player);
+
+		PluginZenMapMarkers mapPlugin = PluginZenMapMarkers.Cast(GetPlugin(PluginZenMapMarkers));
+		if (mapPlugin)
+		{
+			mapPlugin.ClearPlayerMarkers(player);
 		}
 	}
 
