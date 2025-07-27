@@ -73,8 +73,13 @@ class PluginZenMapMarkers extends PluginBase
     MapMarker AddMarker(MapMarker marker)
     {
         m_MapMarkers.Insert(marker);
-        ResyncMarkers();
-        Print("[ZenMapPlugin] Added server-side marker " + marker.GetMarkerText() + " @ " + marker.GetMarkerPos());
+
+        if (GetGame().IsDedicatedServer())
+        {
+            ResyncMarkers();
+            Print("[ZenMapPlugin] Added server-side marker " + marker.GetMarkerText() + " @ " + marker.GetMarkerPos());
+        }
+
         return marker;
     }
 
@@ -368,6 +373,11 @@ class PluginZenMapMarkers extends PluginBase
         array<ref MapMarker> tempArray = new array<ref MapMarker>;
         
         if (!m_PlayerSpecificMapMarkers.Find(uid, tempArray))
+        {
+            return NULL;
+        }
+
+        if (!tempArray)
         {
             return NULL;
         }

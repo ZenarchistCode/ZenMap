@@ -158,7 +158,16 @@ class ZenMapMarkerListView extends ScriptedWidgetEventHandler
 
 		for (i = 0; i < m_SortedMarkerEntries.Count(); i++)
 		{
-			m_MarkerList.AddItem(m_SortedMarkerEntries.Get(i).GetLabel().Trim(), NULL, 0);
+			string markerLabel = m_SortedMarkerEntries.Get(i).GetLabel().Trim();
+
+			#ifdef MAPLINK
+			array<string> strArray = new array<string>;
+			markerLabel.Split("|", strArray);
+			if (strArray && strArray.Count() > 1)
+				markerLabel = strArray.Get(1);
+			#endif
+
+			m_MarkerList.AddItem(markerLabel, NULL, 0);
 		}
 	}
 

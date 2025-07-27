@@ -25,6 +25,9 @@ modded class ExpansionQuestModule
 	{
 		super.RemoveClientMarkers(questID, identity, objectiveIndex);
 
+		if (!identity)
+			return;
+
 		PluginZenMapMarkers mapPlugin = PluginZenMapMarkers.Cast(GetPlugin(PluginZenMapMarkers));
 		if (mapPlugin)
 		{

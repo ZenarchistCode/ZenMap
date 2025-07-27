@@ -128,7 +128,22 @@ modded class MapMenu
 	// Adds marker onto the map widget AND the map item if enabled
 	void AddZenMapMarker(vector pos, string name, int color, int icon, bool saveToMap = false)
 	{
-		AddZenMapWidgetMarker(pos, name, color, MapMarker.GetZenIconImage(icon), (saveToMap && GetZenMapConfig().ClientConfig.AllowPlayerToDecide));
+		string markerText = name;
+
+		#ifdef MAPLINK 
+		if (saveToMap)
+		{
+			array<string> strArray = new array<string>;
+			name.Split("|", strArray);
+
+			if (strArray.Count() > 1)
+			{
+				markerText = strArray.Get(1);
+			}
+		}
+		#endif
+
+		AddZenMapWidgetMarker(pos, markerText, color, MapMarker.GetZenIconImage(icon), (saveToMap && GetZenMapConfig().ClientConfig.AllowPlayerToDecide));
 
 		if (GetZenMapItem() && saveToMap)
 		{
@@ -234,7 +249,28 @@ modded class MapMenu
 			for (i = 0; i < GetZenMapItem().GetMarkerArray().Count(); i++)
 			{
 				map_marker = GetZenMapItem().GetMarkerArray().Get(i);
-				AddZenMapWidgetMarker(map_marker.GetMarkerPos(), map_marker.GetMarkerText(), map_marker.GetMarkerColor(), MapMarker.GetZenIconImage(map_marker.GetMarkerIcon()), GetZenMapConfig().ClientConfig.AllowPlayerToDecide);
+				string markerText = map_marker.GetMarkerText();
+
+				#ifdef MAPLINK
+				string mapName = map_marker.GetZenMapName();
+
+				// MapLink compatibility
+				if (mapName != "")
+				{
+					string thisMapName = GetGame().GetWorldName();
+
+					if (mapName == thisMapName)
+					{
+						markerText = map_marker.GetZenMarkerText();
+					}
+					else 
+					{
+						continue;
+					}
+				}
+				#endif
+
+				AddZenMapWidgetMarker(map_marker.GetMarkerPos(), markerText, map_marker.GetMarkerColor(), MapMarker.GetZenIconImage(map_marker.GetMarkerIcon()), GetZenMapConfig().ClientConfig.AllowPlayerToDecide);
 			}
 		}
 

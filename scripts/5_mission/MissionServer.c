@@ -20,6 +20,20 @@ modded class MissionServer
 		ZenStaticMapsInit();
 	}
 
+	override void OnMissionFinish()
+	{
+		super.OnMissionFinish();
+
+		if (!GetGame())
+			return;
+
+		if (!GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM))
+			return;
+
+		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Remove(DumpStaticMapObjects);
+		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Remove(SetupZenStaticMaps);
+	}
+
 	override void InvokeOnConnect(PlayerBase player, PlayerIdentity identity) 
 	{
 		super.InvokeOnConnect(player, identity);
@@ -179,7 +193,7 @@ modded class MissionServer
 				}
 			}
 
-			// Save this wood object type & all its locations
+			// Save this object type & all its locations
 			mapType.Locations = objLocations;
 		}
 
@@ -191,7 +205,7 @@ modded class MissionServer
 		objectsOnMap.Clear();
 		objectsOnMap = NULL;
 
-		// Setup wood piles
+		// Setup
 		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(SetupZenStaticMaps, 5000, false);
 	}
 }

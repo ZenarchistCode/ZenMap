@@ -592,6 +592,11 @@ class ZenMapRightClickMenu extends ScriptedWidgetEventHandler
 
 			if (m_SaveToMapCB.IsChecked())
 			{
+				#ifdef MAPLINK
+				text.Replace("|", ""); // Don't allow | as that's our maplink separator
+				text = GetGame().GetWorldName() + "|" + text;
+				#endif
+
 				m_MapMenu.AddZenMapMarker(position, text, color, icon, true);
 			}
 			else 
@@ -599,7 +604,6 @@ class ZenMapRightClickMenu extends ScriptedWidgetEventHandler
 				m_MapMenu.AddZenMapClientMarker(position, text, color, icon); 
 			}
 			
-
 			CloseMenu();
 
 			// Damage pen for each use if config'ed.
