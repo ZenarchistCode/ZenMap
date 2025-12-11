@@ -85,11 +85,6 @@ modded class MissionGameplay
 		}
 	}
 
-	void ZenMap_RepeatCheckHands()
-	{
-		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
-	}
-
 	void ZenMap_HandleMapToggleByKeyboardShortcut(Man player)
 	{
 		// Update the map if it's open and attach a map object to it if possible.
@@ -140,6 +135,15 @@ modded class MissionGameplay
 			return;
 		}
 
+		m_ZenMapLoopTimer++;
+		if (m_ZenMapLoopTimer > 20)
+		{
+			//Print("m_ZenMapLoopTimer > 50 - cancelling action");
+			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(ZenMap_EmptyHands);
+			//ZenFunctions.DebugMessage("STOP - 50 calls.");
+			return;
+		}
+
 		ItemBase item = ItemBase.Cast(player.GetItemInHands());
 		if (item)
 		{
@@ -170,6 +174,9 @@ modded class MissionGameplay
 		if (!player)
 			return;
 
+		if (player.IsInVehicle())
+			return;
+
 		if (player.GetItemInHands() && player.GetItemInHands() == item)
 		{
 			m_ZenMapLoopTimer = 0;
@@ -178,8 +185,17 @@ modded class MissionGameplay
 		}
 
 		m_ZenMapLoopTimer++;
-		if (m_ZenMapLoopTimer > 50)
+		if (m_ZenMapLoopTimer > 20)
+		{
+			//Print("m_ZenMapLoopTimer > 50 - cancelling action");
+			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(ZenMap_TakeMapToHands);
+			//ZenFunctions.DebugMessage("STOP - 50 calls.");
 			return;
+		}
+		//else 
+		//{
+		//	Print("m_ZenMapLoopTimer = " + m_ZenMapLoopTimer);
+		//}
 		
 		if (item.GetInventory().CanRemoveEntity() && player.GetInventory().HasEntityInInventory(item) && player.GetHumanInventory().CanAddEntityInHands(item))
 		{
@@ -187,6 +203,7 @@ modded class MissionGameplay
 		}
 		
 		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ZenMap_TakeMapToHands, 100, false, item);
+		//ZenFunctions.DebugMessage("CALL AGAIN: " + m_ZenMapLoopTimer);
 	}
 
 	void ZenMap_TriggerAction()

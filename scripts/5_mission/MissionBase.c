@@ -39,11 +39,45 @@ modded class MissionBase
 		}
 
 		mapPlugin.RemoveAllMarkers();
+		MapMarker marker;
 
 		for (int i = 0; i < data.param1.Count(); i++)
 		{
-			Print("[ZenMap] Received map marker from server: " + data.param1.Get(i).GetMarkerText());
-			mapPlugin.AddMarker(data.param1.Get(i));
+			marker = data.param1.Get(i);
+			if (!marker)
+				continue;
+
+			Print("[ZenMap] Received map marker from server: " + marker.GetMarkerText());
+			mapPlugin.AddMarker(marker);
+
+#ifdef EXPANSIONMODNAVIGATION
+			if (!marker.m_ZenPersonalMarker)
+				continue;
+
+			ExpansionMarkerModule module;
+			CF_Modules<ExpansionMarkerModule>.Get(module);
+
+			if (module)
+			{
+				bool skipThisOne = false;
+				for (int index = 0; index < module.GetData().PersonalGet().Count(); ++index)
+				{
+					if (module.GetData().PersonalGet().Get(index).GetName() == marker.GetMarkerText())
+						skipThisOne = true;
+				}
+
+				if (skipThisOne)
+					continue;
+
+				ExpansionMarkerData markerData = ExpansionMarkerData.Create(ExpansionMapMarkerType.PERSONAL);
+				markerData.SetName(marker.GetMarkerText());
+				markerData.SetIcon(marker.m_ZenIcon);
+				markerData.SetColor(ARGB(255,255,240,0));
+				markerData.SetPosition(marker.GetMarkerPos());
+				markerData.SetLockState(true);
+				module.CreateMarker(markerData);
+			}
+#endif
 		}
 
 		UIManager um = GetGame().GetUIManager();

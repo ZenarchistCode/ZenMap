@@ -5,6 +5,11 @@ modded class MapMarker
 	int m_ObjectiveID;
 	#endif
 
+	#ifdef EXPANSIONMODNAVIGATION
+	bool m_ZenPersonalMarker;
+	string m_ZenIcon;
+	#endif
+
 	static string GetZenIconImage(int iconID)
 	{
 		if (GetZenMapConfig().ClientConfig.IconFiles.Count() == 0)

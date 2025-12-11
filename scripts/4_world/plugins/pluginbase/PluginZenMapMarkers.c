@@ -179,15 +179,15 @@ class PluginZenMapMarkers extends PluginBase
 
     //! PLAYER SPECIFIC MARKERS
 
-    bool AddMarker(PlayerBase player, MapMarker marker)
+    bool AddMarker(PlayerBase player, MapMarker marker, bool forceSync = true)
     {
         if (!player || !player.GetIdentity() || !marker)
             return false;
 
-        return AddMarker(player.GetIdentity(), marker);
+        return AddMarker(player.GetIdentity(), marker, forceSync);
     }
 
-    bool AddMarker(PlayerIdentity identity, MapMarker marker)
+    bool AddMarker(PlayerIdentity identity, MapMarker marker, bool forceSync = true)
     {
         if (!identity || !marker)
             return false;
@@ -214,7 +214,9 @@ class PluginZenMapMarkers extends PluginBase
         tempArray.Insert(marker);
         m_PlayerSpecificMapMarkers.Set(uid, tempArray);
 
-        SyncMarkers(identity);
+        if (forceSync)
+            SyncMarkers(identity);
+
         Print("[ZenMapPlugin] Added player marker " + marker.GetMarkerText() + " @ " + marker.GetMarkerPos() + " for " + uid);
         
         return true;
