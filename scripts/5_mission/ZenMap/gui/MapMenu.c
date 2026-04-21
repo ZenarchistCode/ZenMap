@@ -8,9 +8,9 @@ modded class MapMenu
 	{
 		super.OnShow();
 
-		if (ZenMapStaticObjectsConfig.OPENED_MAP_BY_ZENSTATICMAP)
+		if (OPENED_MAP_BY_ZENSTATICMAP)
 		{
-			PlayerBase pb = PlayerBase.Cast(GetGame().GetPlayer());
+			PlayerBase pb = PlayerBase.Cast(g_Game.GetPlayer());
 			if (!pb)
 				return;
 
@@ -25,14 +25,14 @@ modded class MapMenu
 	{
 		super.CloseMapMenu();
 
-		if (ZenMapStaticObjectsConfig.OPENED_MAP_BY_ZENSTATICMAP)
+		if (OPENED_MAP_BY_ZENSTATICMAP)
 		{
-			ZenMapStaticObjectsConfig.OPENED_MAP_BY_ZENSTATICMAP = false;
-			GetGame().GetMission().RemoveActiveInputExcludes({"map"});
-			GetGame().GetMission().RemoveActiveInputRestriction(EInputRestrictors.MAP);
+			OPENED_MAP_BY_ZENSTATICMAP = false;
+			g_Game.GetMission().RemoveActiveInputExcludes({"map"});
+			g_Game.GetMission().RemoveActiveInputRestriction(EInputRestrictors.MAP);
 		}
 
-		#ifdef ZENMODPACK 
+		#ifdef ZenModPack 
 		if (!ZenModEnabled("ZenMap"))
 			return;
 		#endif
@@ -175,7 +175,7 @@ modded class MapMenu
 
 	void PlayZenMarkerSound()
 	{
-		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+		PlayerBase player = PlayerBase.Cast(g_Game.GetPlayer());
 		if (player)
 		{
 			SEffectManager.PlaySound(GetZenMarkerSoundSet(), player.GetPosition());
@@ -201,7 +201,7 @@ modded class MapMenu
 
 	override void LoadMapMarkers()
 	{
-		#ifdef ZENMODPACK 
+		#ifdef ZenModPack 
 		if (!ZenModEnabled("ZenMap"))
 		{
 			super.LoadMapMarkers();
@@ -257,7 +257,7 @@ modded class MapMenu
 				// MapLink compatibility
 				if (mapName != "")
 				{
-					string thisMapName = GetGame().GetWorldName();
+					string thisMapName = g_Game.GetWorldName();
 
 					if (mapName == thisMapName)
 					{
@@ -279,7 +279,7 @@ modded class MapMenu
 
 	override void Update(float timeslice)
 	{
-		#ifdef ZENMODPACK 
+		#ifdef ZenModPack 
 		if (!ZenModEnabled("ZenMap"))
 		{
 			super.Update(timeslice);

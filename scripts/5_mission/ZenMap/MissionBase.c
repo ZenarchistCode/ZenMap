@@ -80,13 +80,13 @@ modded class MissionBase
 #endif
 		}
 
-		UIManager um = GetGame().GetUIManager();
+		UIManager um = g_Game.GetUIManager();
 		if (!um || !um.IsMenuOpen(MENU_MAP))
 		{
 			return;
 		}
 
-		MapMenu mapMenu = MapMenu.Cast(GetGame().GetUIManager().FindMenu(MENU_MAP));
+		MapMenu mapMenu = MapMenu.Cast(g_Game.GetUIManager().FindMenu(MENU_MAP));
 		if (!mapMenu)
 		{
 			return;

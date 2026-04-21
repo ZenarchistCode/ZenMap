@@ -38,15 +38,15 @@ class ZenMapRightClickMenu extends ScriptedWidgetEventHandler
 	
 	void ZenMapRightClickMenu(MapMenu mapMenu, int mouseX, int mouseY, bool doubleClick = false)
 	{
-		m_Player = PlayerBase.Cast(GetGame().GetPlayer());
+		m_Player = PlayerBase.Cast(g_Game.GetPlayer());
 		if (!m_Player)
 			return;
 
 		m_MapMenu = mapMenu;
 
-		m_RightClickRoot_New	= GetGame().GetWorkspace().CreateWidgets("ZenMap/data/gui/layouts/RightClickOptionsMenuNew.layout", mapMenu.GetLayoutRoot());
-		m_RightClickRoot_Edit	= GetGame().GetWorkspace().CreateWidgets("ZenMap/data/gui/layouts/RightClickOptionsMenuEdit.layout", mapMenu.GetLayoutRoot());
-		m_RightClickRoot_GUI	= GetGame().GetWorkspace().CreateWidgets("ZenMap/data/gui/layouts/RightClickOptionsMenuGUI.layout", mapMenu.GetLayoutRoot());
+		m_RightClickRoot_New	= g_Game.GetWorkspace().CreateWidgets("ZenMap/data/gui/layouts/RightClickOptionsMenuNew.layout", mapMenu.GetLayoutRoot());
+		m_RightClickRoot_Edit	= g_Game.GetWorkspace().CreateWidgets("ZenMap/data/gui/layouts/RightClickOptionsMenuEdit.layout", mapMenu.GetLayoutRoot());
+		m_RightClickRoot_GUI	= g_Game.GetWorkspace().CreateWidgets("ZenMap/data/gui/layouts/RightClickOptionsMenuGUI.layout", mapMenu.GetLayoutRoot());
 		
 		if (!m_RightClickRoot_New || !m_RightClickRoot_Edit || !m_RightClickRoot_GUI)
 		{
@@ -427,7 +427,7 @@ class ZenMapRightClickMenu extends ScriptedWidgetEventHandler
 		string cfgPath = "CfgVehicles " + pen.GetType() + " ";
 		int color;
 
-		if (GetGame().ConfigIsExisting(cfgPath + "penColor"))
+		if (g_Game.ConfigIsExisting(cfgPath + "penColor"))
 		{
 			// ZenNotes compatibility
 			// Get RGB pen color from config.cpp
@@ -436,10 +436,10 @@ class ZenMapRightClickMenu extends ScriptedWidgetEventHandler
 			color = ARGB(255, rgbArray[0], rgbArray[1], rgbArray[2]);
 		}
 		else 
-		if (GetGame().ConfigIsExisting(cfgPath + "writingColor"))
+		if (g_Game.ConfigIsExisting(cfgPath + "writingColor"))
 		{
 			string hexColor;
-			if (GetGame().ConfigGetText(cfgPath + "writingColor", hexColor))
+			if (g_Game.ConfigGetText(cfgPath + "writingColor", hexColor))
 			{
 				color = HexToARGB(hexColor);
 			}
@@ -594,7 +594,7 @@ class ZenMapRightClickMenu extends ScriptedWidgetEventHandler
 			{
 				#ifdef MAPLINK
 				text.Replace("|", ""); // Don't allow | as that's our maplink separator
-				text = GetGame().GetWorldName() + "|" + text;
+				text = g_Game.GetWorldName() + "|" + text;
 				#endif
 
 				m_MapMenu.AddZenMapMarker(position, text, color, icon, true);

@@ -47,7 +47,7 @@ modded class ChernarusMap
 	{
 		Param1<ref array<ref MapMarker>> syncData = new Param1<ref array<ref MapMarker>>(m_MapMarkerArray);
 
-		if (GetGame().IsDedicatedServer())
+		if (g_Game.IsDedicatedServer())
 		{
 			ZenMapDamageOnOpen();
 
@@ -67,7 +67,7 @@ modded class ChernarusMap
 
 	void RequestZenSync()
 	{
-		if (GetGame().IsClient())
+		if (g_Game.IsClient())
 		{
 			RPCSingleParam(ERPCs.RPC_SEND_MAP_MARKERS + 1000, new Param1<bool>(true), true);
 		}
@@ -79,7 +79,7 @@ modded class ChernarusMap
 	{
 		super.OnRPC(sender, rpc_type, ctx);
 
-		if (GetGame().IsDedicatedServer() && rpc_type == ERPCs.RPC_SEND_MAP_MARKERS + 1000)
+		if (g_Game.IsDedicatedServer() && rpc_type == ERPCs.RPC_SEND_MAP_MARKERS + 1000)
 		{
 			SyncMapMarkers();
 		}
@@ -94,7 +94,7 @@ modded class ChernarusMap
 
 	override void InsertMarker(vector pos, string text, int color, int idx)
 	{
-		#ifdef ZENMODPACK 
+		#ifdef ZenModPack 
 		if (!ZenModEnabled("ZenMap"))
 		{
 			super.InsertMarker(pos, text, color, idx);
@@ -107,7 +107,7 @@ modded class ChernarusMap
 
 	override void SyncMapMarkers()
 	{
-		#ifdef ZENMODPACK 
+		#ifdef ZenModPack 
 		if (!ZenModEnabled("ZenMap"))
 		{
 			super.SyncMapMarkers();

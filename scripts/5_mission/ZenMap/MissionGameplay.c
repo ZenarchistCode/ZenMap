@@ -6,7 +6,7 @@ modded class MissionGameplay
 	{
 		super.OnUpdate(timeslice);
 
-		#ifdef ZENMODPACK 
+		#ifdef ZenModPack 
 		if (!ZenModEnabled("ZenMap"))
 		{
 			return;
@@ -25,13 +25,13 @@ modded class MissionGameplay
 
 		if (GetUApi().GetInputByID(UAMapToggle).LocalPress())
 		{
-			MapMenu mapMenu = MapMenu.Cast(GetGame().GetUIManager().FindMenu(MENU_MAP));
-			if (GetGame().GetUIManager().GetMenu() != NULL && GetGame().GetUIManager().GetMenu() != mapMenu)
+			MapMenu mapMenu = MapMenu.Cast(g_Game.GetUIManager().FindMenu(MENU_MAP));
+			if (g_Game.GetUIManager().GetMenu() != NULL && g_Game.GetUIManager().GetMenu() != mapMenu)
 			{
 				return;
 			}
 
-			PlayerBase playerBase = PlayerBase.Cast(GetGame().GetPlayer());
+			PlayerBase playerBase = PlayerBase.Cast(g_Game.GetPlayer());
 			if (!playerBase)
 			{
 				return;
@@ -77,7 +77,7 @@ modded class MissionGameplay
 
 			ZenMap_HandleMapToggleByKeyboardShortcut(player);
 
-			MapMenu mapMenu = MapMenu.Cast(GetGame().GetUIManager().FindMenu(MENU_MAP));
+			MapMenu mapMenu = MapMenu.Cast(g_Game.GetUIManager().FindMenu(MENU_MAP));
 			if (mapMenu)
 			{
 				mapMenu.LoadMapMarkers();
@@ -88,7 +88,7 @@ modded class MissionGameplay
 	void ZenMap_HandleMapToggleByKeyboardShortcut(Man player)
 	{
 		// Update the map if it's open and attach a map object to it if possible.
-		UIManager um = GetGame().GetUIManager();
+		UIManager um = g_Game.GetUIManager();
 		if (!um || !um.IsMenuOpen(MENU_MAP))
 		{
 			return;
@@ -107,7 +107,7 @@ modded class MissionGameplay
 			return;
 		}
 
-		MapMenu mapMenu = MapMenu.Cast(GetGame().GetUIManager().FindMenu(MENU_MAP));
+		MapMenu mapMenu = MapMenu.Cast(g_Game.GetUIManager().FindMenu(MENU_MAP));
 		if (!mapMenu)
 		{
 			return;
@@ -119,12 +119,12 @@ modded class MissionGameplay
 
 		// Zero time between requesting map marker sync and displaying map menu GUI means we need to delay update of map markers til AFTER menu has opened, 
 		// 1 sec ought to be enough 99.9% of the time. If it takes longer than 1 sec then the server has much bigger issues than map marker desync.
-		GetGame().GetCallQueue(CALL_CATEGORY_GUI).CallLater(UpdateZenMapMarkers, 1000, false);
+		g_Game.GetCallQueue(CALL_CATEGORY_GUI).CallLater(UpdateZenMapMarkers, 1000, false);
 	}
 
 	void ZenMap_EmptyHands(notnull ItemBase mapItem)
 	{
-		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+		PlayerBase player = PlayerBase.Cast(g_Game.GetPlayer());
 		if (!player)
 			return;
 
@@ -139,7 +139,7 @@ modded class MissionGameplay
 		if (m_ZenMapLoopTimer > 20)
 		{
 			//Print("m_ZenMapLoopTimer > 50 - cancelling action");
-			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(ZenMap_EmptyHands);
+			g_Game.GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(ZenMap_EmptyHands);
 			//ZenFunctions.DebugMessage("STOP - 50 calls.");
 			return;
 		}
@@ -165,12 +165,12 @@ modded class MissionGameplay
 			}
 		}
 
-		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ZenMap_EmptyHands, 100, false, mapItem);
+		g_Game.GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ZenMap_EmptyHands, 100, false, mapItem);
 	}
 
 	void ZenMap_TakeMapToHands(notnull ItemBase item)
 	{
-		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+		PlayerBase player = PlayerBase.Cast(g_Game.GetPlayer());
 		if (!player)
 			return;
 
@@ -180,7 +180,7 @@ modded class MissionGameplay
 		if (player.GetItemInHands() && player.GetItemInHands() == item)
 		{
 			m_ZenMapLoopTimer = 0;
-			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ZenMap_TriggerAction, 100, false);
+			g_Game.GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ZenMap_TriggerAction, 100, false);
 			return;
 		}
 
@@ -188,7 +188,7 @@ modded class MissionGameplay
 		if (m_ZenMapLoopTimer > 20)
 		{
 			//Print("m_ZenMapLoopTimer > 50 - cancelling action");
-			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(ZenMap_TakeMapToHands);
+			g_Game.GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(ZenMap_TakeMapToHands);
 			//ZenFunctions.DebugMessage("STOP - 50 calls.");
 			return;
 		}
@@ -202,13 +202,13 @@ modded class MissionGameplay
 			player.PredictiveTakeEntityToHands(item);
 		}
 		
-		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ZenMap_TakeMapToHands, 100, false, item);
+		g_Game.GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ZenMap_TakeMapToHands, 100, false, item);
 		//ZenFunctions.DebugMessage("CALL AGAIN: " + m_ZenMapLoopTimer);
 	}
 
 	void ZenMap_TriggerAction()
 	{
-		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+		PlayerBase player = PlayerBase.Cast(g_Game.GetPlayer());
 		if (!player)
 			return;
 
@@ -230,18 +230,18 @@ modded class MissionGameplay
 		}
 
 		// Keep trying until action timeout or action is running
-		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ZenMap_TriggerAction, 100, false, player);
+		g_Game.GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ZenMap_TriggerAction, 100, false, player);
 	}
 
 	void UpdateZenMapMarkers()
 	{
-		UIManager um = GetGame().GetUIManager();
+		UIManager um = g_Game.GetUIManager();
 		if (!um || !um.IsMenuOpen(MENU_MAP))
 		{
 			return;
 		}
 
-		MapMenu mapMenu = MapMenu.Cast(GetGame().GetUIManager().FindMenu(MENU_MAP));
+		MapMenu mapMenu = MapMenu.Cast(g_Game.GetUIManager().FindMenu(MENU_MAP));
 		if (!mapMenu)
 		{
 			return;

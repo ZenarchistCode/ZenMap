@@ -1,44 +1,93 @@
-class ZenMapConfig extends Managed
+static bool OPENED_MAP_BY_ZENSTATICMAP = false;
+
+ref ZenMapConfig g_ZenMapConfig;
+
+static ZenMapConfig GetZenMapConfig()
 {
-	private const static string zenModFolder = "$profile:\\Zenarchist\\";
-	private const static string zenConfigName = "ZenMapConfig.json";
+	if (!g_ZenMapConfig) GetZenConfigRegister().RegisterConfig(ZenMapConfig);
+	return g_ZenMapConfig;
+}
 
-	ref ZenMapClientSyncConfig ClientConfig;
-	ref array<ref ZenMapMarker> ServerMapMarkers;
-
-	void Load()
+modded class ZenConfigRegister
+{
+	override void RegisterPreload()
 	{
-		ServerMapMarkers = new array<ref ZenMapMarker>;
+		super.RegisterPreload(); 
+		RegisterType(ZenMapConfig);
+	}
+}
 
-		if (!GetGame().IsDedicatedServer())
-			return;
-
-		if (FileExist(zenModFolder + zenConfigName))
-		{
-			JsonFileLoader<ZenMapConfig>.JsonLoadFile(zenModFolder + zenConfigName, this);
-			return;
-		}
-		
-		ServerMapMarkers.Insert(new ZenMapMarker("Example Marker", "8229.091797 471.185577 9031.171875", "DZ/gear/navigation/data/map_border_cross_ca.paa", ARGB(255, 255, 0, 0)));
+class ZenMapConfig_SyncPayload
+{
+	ref ZenMapClientSyncConfig ClientConfig;
+	
+	void ZenMapConfig_SyncPayload()
+	{
 		ClientConfig = new ZenMapClientSyncConfig();
+	}
+}
 
-		Save();
+class ZenMapConfig : ZenConfigBase
+{
+	// -------------------------
+	// CONFIG SETTINGS
+	// -------------------------
+	override void OnRegistered()
+	{
+		g_ZenMapConfig = this;
+	}
+	
+	override string    	GetCurrentVersion()   		{ return "1.29.1"; }
+	override bool		ShouldLoadOnServer() 		{ return true; }
+	override bool		ShouldSyncToClient()		{ return true; }
+	
+	override bool ReadJson(string path, out string err)
+	{
+		return JsonFileLoader<ZenMapConfig>.LoadFile(path, this, err);
 	}
 
-	void Save()
+	override bool WriteJson(string path, out string err)
 	{
-		// If config folder doesn't exist, create it.
-		if (!FileExist("$profile:\\Zenarchist"))
+		return JsonFileLoader<ZenMapConfig>.SaveFile(path, this, err);
+	}
+
+	override bool BuildSyncPayload(out string payload, out string err)
+	{
+		ZenMapConfig_SyncPayload snap = new ZenMapConfig_SyncPayload();
+
+		snap.ClientConfig = ClientConfig;
+
+		// Serialize payload only (NOT the whole config)
+		return JsonFileLoader<ZenMapConfig_SyncPayload>.MakeData(snap, payload, err, false);
+	}
+
+	override bool ApplySyncPayload(string payload, out string err)
+	{
+		// Create default containers in case an error happens on read
+		ClientConfig = new ZenMapClientSyncConfig();
+
+		ZenMapConfig_SyncPayload snap = new ZenMapConfig_SyncPayload();
+		if (!JsonFileLoader<ZenMapConfig_SyncPayload>.LoadData(payload, snap, err))
 		{
-			MakeDirectory(zenModFolder);
+			return false;
 		}
 
-		if (!FileExist(zenModFolder))
-		{
-			MakeDirectory(zenModFolder);
-		}
-
-		JsonFileLoader<ZenMapConfig>.JsonSaveFile(zenModFolder + zenConfigName, this);
+		ClientConfig = snap.ClientConfig;
+		
+		return true;
+	}
+	
+	// -------------------------
+	// CONFIG VARIABLES
+	// -------------------------
+	ref ZenMapClientSyncConfig ClientConfig;
+	ref array<ref ZenMapMarker> ServerMapMarkers;
+	
+	override void SetDefaults()
+	{
+		ServerMapMarkers = new array<ref ZenMapMarker>;
+		ServerMapMarkers.Insert(new ZenMapMarker("Example Marker", "8229.091797 471.185577 9031.171875", "DZ/gear/navigation/data/map_border_cross_ca.paa", ARGB(255, 255, 0, 0)));
+		ClientConfig = new ZenMapClientSyncConfig();
 	}
 
 	int FileToArrayIndex(string file)
@@ -143,22 +192,4 @@ class ZenMapClientSyncConfig
 		NoPenColors.Insert(-16119286);	// purple
 		NoPenColors.Insert(-27136);		// orange
 	}
-}
-
-static ref ZenMapConfig m_ZenMapConfig;
-
-static ZenMapConfig GetZenMapConfig()
-{
-	if (!m_ZenMapConfig)
-	{
-		#ifdef ZENMODPACK
-		ZMPrint("[ZenMapConfig] Init");
-		#else
-		Print("[ZenMapConfig] Init");
-		#endif
-		m_ZenMapConfig = new ZenMapConfig;
-		m_ZenMapConfig.Load();
-	}
-
-	return m_ZenMapConfig;
 }

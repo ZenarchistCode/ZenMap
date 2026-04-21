@@ -36,7 +36,7 @@ class ActionZenMergeMapMarkers : ActionContinuousBase
 
 		if (GetZenMapConfig().ClientConfig.AllowCopyMapToMap)
 		{
-			if (GetGame().IsDedicatedServer())
+			if (g_Game.IsDedicatedServer())
 				return true; // Don't bother using resources searching for pen on server, it's not like this needs to be a super secure anti-hack feature.
 
 			if (GetZenMapConfig().ClientConfig.RequirePenToMark)

@@ -7,7 +7,8 @@ class CfgPatches
 		{
 			"DZ_Data",
 			"DZ_Scripts",
-			"DZ_Gear_Navigation"
+			"DZ_Gear_Navigation",
+			"ZenModCore"
 		};
 	};
 };
@@ -16,25 +17,12 @@ class CfgMods
 {
 	class ZenMap
 	{
-		dir="ZenMap";
-        name="ZenMap";
-        credits="Zenarchist";
-        author="Zenarchist";
-        authorID="0";
-        version="0.1";
-        extra=0;
-        type = "Mod";
-	    dependencies[]={"Game", "World", "Mission"};
+		author = "Zenarchist";
+		type = "mod";
+		storageVersion = 1; // CF storage
+		dependencies[] = { "Game","World","Mission" };
 	    class defs
 	    {
-			class engineScriptModule
-			{
-				files[]=
-				{
-					"ZenMap/scripts/common"
-				};
-			};
-
 			class gameLibScriptModule
 			{
 				files[]=

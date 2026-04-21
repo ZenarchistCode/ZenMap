@@ -5,7 +5,7 @@ class ZenMapErrorDialog extends ScriptedWidgetEventHandler
 
 	void ZenMapErrorDialog(MapMenu mapMenu)
 	{
-		m_ErrorGUI	= GetGame().GetWorkspace().CreateWidgets("ZenMap/data/gui/layouts/RightClickOptionsMenuError.layout", mapMenu.GetLayoutRoot());
+		m_ErrorGUI	= g_Game.GetWorkspace().CreateWidgets("ZenMap/data/gui/layouts/RightClickOptionsMenuError.layout", mapMenu.GetLayoutRoot());
 		
 		if (!m_ErrorGUI)
 		{
@@ -34,8 +34,8 @@ class ZenMapErrorDialog extends ScriptedWidgetEventHandler
 		m_ErrorGUI.SetPos(x, y);
 		m_ErrorGUI.Show(true);
 
-		GetGame().GetCallQueue(CALL_CATEGORY_GUI).Remove(HideErrorDialog);
-		GetGame().GetCallQueue(CALL_CATEGORY_GUI).CallLater(HideErrorDialog, 6000, false);
+		g_Game.GetCallQueue(CALL_CATEGORY_GUI).Remove(HideErrorDialog);
+		g_Game.GetCallQueue(CALL_CATEGORY_GUI).CallLater(HideErrorDialog, 6000, false);
 	}
 
 	void HideErrorDialog()

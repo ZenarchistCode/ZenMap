@@ -18,17 +18,17 @@ class ActionOpenStaticZenMap : ActionInteractBase
 
 	override void OnStartClient(ActionData action_data)
 	{
-		UIManager um = GetGame().GetUIManager();
+		UIManager um = g_Game.GetUIManager();
 		if (um && !um.IsMenuOpen(MENU_MAP))
 		{
 			um.CloseAll();
 
-			ZenMapStaticObjectsConfig.OPENED_MAP_BY_ZENSTATICMAP = true;
+			OPENED_MAP_BY_ZENSTATICMAP = true;
 
 			if (um.EnterScriptedMenu(MENU_MAP, null) != NULL)
 			{
-				GetGame().GetMission().AddActiveInputExcludes({"map"});
-				GetGame().GetMission().AddActiveInputRestriction(EInputRestrictors.MAP);
+				g_Game.GetMission().AddActiveInputExcludes({"map"});
+				g_Game.GetMission().AddActiveInputRestriction(EInputRestrictors.MAP);
 			}
 		}
 	}

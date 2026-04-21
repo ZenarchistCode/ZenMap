@@ -7,7 +7,7 @@ class PluginZenMapMarkers extends PluginBase
 
 	override void OnInit()
     {
-        #ifdef ZENMODPACK
+        #ifdef ZenModPack
         ZMPrint("[PluginZenMapMarkers] :: OnInit");
         #else
         Print("[PluginZenMapMarkers] :: OnInit");
@@ -21,7 +21,7 @@ class PluginZenMapMarkers extends PluginBase
 
     void AddStaticServerMarks()
     {
-        if (!GetGame().IsDedicatedServer())
+        if (!g_Game.IsDedicatedServer())
             return;
 
         ZenMapMarker serverMarker;
@@ -74,7 +74,7 @@ class PluginZenMapMarkers extends PluginBase
     {
         m_MapMarkers.Insert(marker);
 
-        if (GetGame().IsDedicatedServer())
+        if (g_Game.IsDedicatedServer())
         {
             ResyncMarkers();
             Print("[ZenMapPlugin] Added server-side marker " + marker.GetMarkerText() + " @ " + marker.GetMarkerPos());
@@ -430,12 +430,12 @@ class PluginZenMapMarkers extends PluginBase
 
     void ResyncMarkers()
     {
-        if (!GetGame().IsDedicatedServer())
+        if (!g_Game.IsDedicatedServer())
             return;
 
         PlayerBase player;
         array<Man> onlinePlayers = new array<Man>;
-		GetGame().GetPlayers(onlinePlayers);
+		g_Game.GetPlayers(onlinePlayers);
 
         foreach (Man man : onlinePlayers)
         {
@@ -457,7 +457,7 @@ class PluginZenMapMarkers extends PluginBase
 
     void SyncMarkers(notnull PlayerIdentity identity)
     {
-        if (!GetGame().IsDedicatedServer())
+        if (!g_Game.IsDedicatedServer())
             return;
 
         if (CfgGameplayHandler.GetUse3DMap())

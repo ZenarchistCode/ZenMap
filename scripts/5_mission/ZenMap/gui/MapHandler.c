@@ -4,12 +4,12 @@ modded class MapHandler
 
 	void MapHandler(Widget w)
 	{
-		m_ZenMapMenu = MapMenu.Cast(GetGame().GetUIManager().FindMenu(MENU_MAP));
+		m_ZenMapMenu = MapMenu.Cast(g_Game.GetUIManager().FindMenu(MENU_MAP));
 	}
 
 	override bool OnMouseButtonDown(Widget w, int x, int y, int button)
 	{
-		#ifdef ZENMODPACK 
+		#ifdef ZenModPack 
 		if (!ZenModEnabled("ZenMap"))
 		{
 			return super.OnMouseButtonDown(w, x, y, button);
@@ -38,7 +38,7 @@ modded class MapHandler
 
 	override bool OnDoubleClick(Widget w, int x, int y, int button)
 	{
-		#ifdef ZENMODPACK 
+		#ifdef ZenModPack 
 		if (!ZenModEnabled("ZenMap"))
 		{
 			return super.OnDoubleClick(w, x, y, button);

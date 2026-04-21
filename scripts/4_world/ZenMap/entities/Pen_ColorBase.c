@@ -6,7 +6,7 @@ modded class Pen_ColorBase
     {
         super.OnRPC(sender, rpc_type, ctx);
 
-        if (!GetGame().IsDedicatedServer())
+        if (!g_Game.IsDedicatedServer())
             return;
 
         if (rpc_type != ZENMAP_ACTION_RPC)

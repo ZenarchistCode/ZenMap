@@ -16,8 +16,8 @@ class ZenMapMarkerListView extends ScriptedWidgetEventHandler
 	{
 		m_MapMenu = mapMenu;
 
-		m_ViewListButtonGUI = GetGame().GetWorkspace().CreateWidgets("ZenMap/data/gui/layouts/ViewMarkersButton.layout", mapMenu.GetLayoutRoot());
-		m_ConfirmGUI = GetGame().GetWorkspace().CreateWidgets("ZenMap/data/gui/layouts/ConfirmDialog.layout", mapMenu.GetLayoutRoot());
+		m_ViewListButtonGUI = g_Game.GetWorkspace().CreateWidgets("ZenMap/data/gui/layouts/ViewMarkersButton.layout", mapMenu.GetLayoutRoot());
+		m_ConfirmGUI = g_Game.GetWorkspace().CreateWidgets("ZenMap/data/gui/layouts/ConfirmDialog.layout", mapMenu.GetLayoutRoot());
 
 		if (!m_ViewListButtonGUI)
 		{
