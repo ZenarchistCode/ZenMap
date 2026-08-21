@@ -37,7 +37,7 @@ modded class MissionGameplay
 				return;
 			}
 
-			ChernarusMap mapItem = ChernarusMap.Cast(playerBase.ZenMap_GetItem("ItemMap"));
+			ItemMap mapItem = ItemMap.Cast(playerBase.ZenMap_GetItem("ItemMap"));
 
 			if (!mapItem)
 			{
@@ -68,7 +68,7 @@ modded class MissionGameplay
 			return;
 		}
 
-		ChernarusMap mapItem = ChernarusMap.Cast(playerBase.ZenMap_GetItem("ItemMap"));
+		ItemMap mapItem = ItemMap.Cast(playerBase.ZenMap_GetItem("ItemMap"));
 		
 		// If we're not taking a map to hands or we have no map, then we can just use vanilla code and update markers if necessary.
 		if (!CfgGameplayHandler.GetUse3DMap() && (!GetZenMapConfig().ClientConfig.TakeMapToHandsOnHotkey || (!mapItem && CfgGameplayHandler.GetMapIgnoreMapOwnership())))
@@ -101,11 +101,19 @@ modded class MissionGameplay
 		}
 
 		// Map menu is open - request sync if we have a map in our inventory!
+		#ifdef dzn_map_namalsk
+		dzn_map_namalsk mapItem = dzn_map_namalsk.Cast(pb.ZenMap_GetItem("ItemMap"));
+		if (!mapItem)
+		{
+			return;
+		}
+		#else 
 		ChernarusMap mapItem = ChernarusMap.Cast(pb.ZenMap_GetItem("ItemMap"));
 		if (!mapItem)
 		{
 			return;
 		}
+		#endif
 
 		MapMenu mapMenu = MapMenu.Cast(g_Game.GetUIManager().FindMenu(MENU_MAP));
 		if (!mapMenu)

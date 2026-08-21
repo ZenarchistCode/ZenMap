@@ -52,13 +52,25 @@ class ActionZenMergeMapMarkers : ActionContinuousBase
 
 	override void OnFinishProgressServer(ActionData action_data)
 	{
+		#ifdef namalsk_survival
+		dzn_map_namalsk originMap = dzn_map_namalsk.Cast(action_data.m_MainItem);
+		if (!originMap)
+			return;
+		#else
 		ChernarusMap originMap = ChernarusMap.Cast(action_data.m_MainItem);
 		if (!originMap)
 			return;
+		#endif
 
+		#ifdef namalsk_survival
+		dzn_map_namalsk secondMap = dzn_map_namalsk.Cast(action_data.m_Target.GetObject());
+		if (!secondMap)
+			return;
+		#else 
 		ChernarusMap secondMap = ChernarusMap.Cast(action_data.m_Target.GetObject());
 		if (!secondMap)
 			return;
+		#endif
 
 		int markerCount = originMap.GetMarkerArray().Count();
 		originMap.ZenCopyMarkers(secondMap);

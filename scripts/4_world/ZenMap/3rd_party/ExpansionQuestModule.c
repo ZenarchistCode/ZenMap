@@ -1,9 +1,12 @@
-#ifdef EXPANSIONMODQUESTS
+#ifdef DZ_Expansion_Quests
 modded class ExpansionQuestModule
 {
 	override void CreateClientMarker(vector pos, string text, int questID, PlayerIdentity identity, int objectiveIndex, int visibility = -1)
 	{
 		super.CreateClientMarker(pos, text, questID, identity, objectiveIndex, visibility);
+
+		if (!GetZenMapConfig().ExpansionModCompatibility)
+			return;
 
 		PluginZenMapMarkers mapPlugin = PluginZenMapMarkers.Cast(GetPlugin(PluginZenMapMarkers));
 		if (mapPlugin)
@@ -26,6 +29,9 @@ modded class ExpansionQuestModule
 		super.RemoveClientMarkers(questID, identity, objectiveIndex);
 
 		if (!identity)
+			return;
+
+		if (!GetZenMapConfig().ExpansionModCompatibility)
 			return;
 
 		PluginZenMapMarkers mapPlugin = PluginZenMapMarkers.Cast(GetPlugin(PluginZenMapMarkers));

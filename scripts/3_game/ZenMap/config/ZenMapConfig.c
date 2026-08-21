@@ -27,7 +27,7 @@ class ZenMapConfig_SyncPayload
 	}
 }
 
-class ZenMapConfig : ZenConfigBase
+class ZenMapConfig : ZenObjectHookConfigBase
 {
 	// -------------------------
 	// CONFIG SETTINGS
@@ -37,9 +37,19 @@ class ZenMapConfig : ZenConfigBase
 		g_ZenMapConfig = this;
 	}
 	
-	override string    	GetCurrentVersion()   		{ return "1.29.1"; }
+	override ZenObjectHookDbBase GetDB()
+	{
+		return GetZenMapStaticObjectsDB();
+	}
+	
+	override string    	GetCurrentVersion()   		{ return "1.29.3"; }
 	override bool		ShouldLoadOnServer() 		{ return true; }
 	override bool		ShouldSyncToClient()		{ return true; }
+	
+	override bool IsServerOnlyConfig()
+	{
+		return false;
+	}
 	
 	override bool ReadJson(string path, out string err)
 	{
@@ -80,14 +90,42 @@ class ZenMapConfig : ZenConfigBase
 	// -------------------------
 	// CONFIG VARIABLES
 	// -------------------------
+	bool ExpansionModCompatibility;
 	ref ZenMapClientSyncConfig ClientConfig;
 	ref array<ref ZenMapMarker> ServerMapMarkers;
 	
 	override void SetDefaults()
 	{
+		super.SetDefaults();
+
+		ExpansionModCompatibility = false;
+		
 		ServerMapMarkers = new array<ref ZenMapMarker>;
 		ServerMapMarkers.Insert(new ZenMapMarker("Example Marker", "8229.091797 471.185577 9031.171875", "DZ/gear/navigation/data/map_border_cross_ca.paa", ARGB(255, 255, 0, 0)));
 		ClientConfig = new ZenMapClientSyncConfig();
+		
+		SpawnHooks.Insert(new ZenObjectHookDef("trailmap_enoch", "Zen_StaticMap", "0 0 0", "0 0 0", 1, 1));
+	}
+	
+	override void AfterLoad()
+	{
+		if (g_Game.IsClient())
+			return;
+		
+		super.AfterLoad();
+	}
+	
+	override bool ShouldSpawn()
+	{
+		if (!SpawnObjects)
+			return false;
+		
+		#ifdef ZenModPack
+		if (!ZenModEnabled("ZenMap"))
+			return false;
+		#endif
+		
+		return true;
 	}
 
 	int FileToArrayIndex(string file)
